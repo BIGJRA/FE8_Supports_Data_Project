@@ -55,15 +55,9 @@ def convert_to_character_dict(dictionary):
     and returns a dictionary with key: character and values: list of support partners,
     represented as tuples (name, base, rate)."""
 
-    #shrink dictionary for better readability in early testing
-    #for header in dictionary:
-    #    for pos in range(len(dictionary)):
-    #        dictionary[header] = list(dictionary[header][:3])
-    #print(dictionary)
-
-
     result = {}
     for pos, character_name in enumerate(dictionary["Character"]):
+        character_name = character_name.replace(' ', '')
         result[character_name] = []
         for option_num in range(1, len(dictionary)):
 
