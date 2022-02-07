@@ -71,11 +71,15 @@ def convert_to_character_dict(dictionary):
 
             # extracts the three parts from data
             data = content.split()
+            data_dict = {
+                "partner" : data[0],
+                "base" : int(data[1]),
+                "rate" : int(data[-1][1:]),
+                "finished" : False,
+                "in_progress": False
+                }
 
-            # removes the plus sign from the rate
-            data[-1] = data[-1][1:]
-
-            result[character_name].append(data + [False])
+            result[character_name].append(data_dict)
 
     return result
 
