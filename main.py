@@ -78,7 +78,6 @@ def convert_to_character_dict(dictionary):
                 "finished" : False,
                 "in_progress": False
                 }
-
             result[character_name].append(data_dict)
 
     return result
