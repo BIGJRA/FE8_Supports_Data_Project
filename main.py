@@ -1,19 +1,21 @@
 import requests
 import lxml.html as lh
+import json
+
 
 def get_table_rows(url, strip_word=None):
-    """ Takes as input a string containing a url.
+    """ Takes as input a string containing url.
     Returns a dictionary in the form of a tuple:
     Index 0 contains the table column name,
     Index 1 is a list of the text in the entries going down."""
 
-    #Page handles the contents of url
+    # Page handles the contents of url
     page = requests.get(url)
 
-    #Store the contents of page
+    # Store the contents of page
     doc = lh.fromstring(page.content)
 
-    #Parse data stored in <tr> tags
+    # Parse data stored in <tr> tags
     tr_elements = doc.xpath('//tr')
 
     # Create empty list
@@ -23,19 +25,19 @@ def get_table_rows(url, strip_word=None):
     for t in tr_elements[0]:
         i += 1
         name = t.text_content()
-        #print ('%d:"%s"' % (i, name))
+        # print ('%d:"%s"' % (i, name))
         col.append((name, []))
 
     # Since out first row is the header, data is stored on the second row onwards
     for j in range(1, len(tr_elements)):
-        # T is our j'th row
-        T = tr_elements[j]
+        # T is our jth row
+        row_j = tr_elements[j]
 
-        # i is the index of our column
+        # column
         i = 0
 
         # Iterate through each element of the row
-        for t in T.iterchildren():
+        for t in row_j.iterchildren():
             data = t.text_content()
 
             # Here it skips the row if the first element is strip_word. Helps solve a problem
@@ -43,15 +45,16 @@ def get_table_rows(url, strip_word=None):
             if strip_word is not None and data == strip_word:
                 break
 
-            # Append the data to the empty list of the i'th column
+            # Append the data to the empty list of the ith column
             col[i][1].append(data)
             # Increment i for the next column
             i += 1
 
     return {title: column for (title, column) in col}
 
+
 def convert_to_character_dict(dictionary):
-    """ Takes as input a column: values dictionary format that is obtained from serenesforest
+    """ Takes as input a column: values dictionary format that is obtained from serenes forest
     and returns a dictionary with key: character and values: list of support partners,
     represented as tuples (name, base, rate)."""
 
@@ -61,7 +64,7 @@ def convert_to_character_dict(dictionary):
         result[character_name] = []
         for option_num in range(1, len(dictionary)):
 
-            #ignores if the text is simply "-"
+            # ignores if the text is simply "-"
             content = dictionary[f"Option {option_num}"][pos]
             if content == "–":
                 break
@@ -72,15 +75,18 @@ def convert_to_character_dict(dictionary):
             # removes the plus sign from the rate
             data[-1] = data[-1][1:]
 
-            result[character_name].append(tuple(data))
+            result[character_name].append(data + [False])
 
     return result
 
 
+def write_to_json(filename, dictionary):
+    with open(filename, 'w') as f:
+        f.write(json.dumps(dictionary))
+
 
 if __name__ == "__main__":
-    url = "https://serenesforest.net/the-sacred-stones/characters/supports/"
-    d = get_table_rows(url, strip_word="Character")
+    serenes = "https://serenesforest.net/the-sacred-stones/characters/supports/"
+    d = get_table_rows(serenes, strip_word="Character")
     d = convert_to_character_dict(d)
-    print (d)
-
+    write_to_json('file.json', d)
