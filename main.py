@@ -85,8 +85,8 @@ def convert_to_character_dict(dictionary):
 
 
 if __name__ == "__main__":
-url = "https://serenesforest.net/the-sacred-stones/characters/supports/"
-d = get_table_rows(url, strip_word="Character")
-d = convert_to_character_dict(d)
-print (d)
+    url = "https://serenesforest.net/the-sacred-stones/characters/supports/"
+    d = get_table_rows(url, strip_word="Character")
+    d = convert_to_character_dict(d)
+    print (d)
 
