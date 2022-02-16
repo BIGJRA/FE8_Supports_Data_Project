@@ -38,7 +38,7 @@ class SupportTracker:
                 if partner_data["in_progress"]:
                     char1, char2 = sorted([character, partner_data["partner"]])
                     result.add((char1, char2, partner_data["finished"]))
-        return sorted(list(result))
+        return list(result)
 
     def get_finished_pairs(self):
         """ Returns as list of tuples the currently active pairs in the form
@@ -88,6 +88,12 @@ class SupportTracker:
             check_idx = (check_idx + 1) % n
             check_count += 1
         return None
+
+    def add_new_random_pair(self):
+        """ Adds a random new pair to the tracker with no support level.
+        """
+        char1, char2 = self.get_new_pair()
+        self.set_current(char1, char2)
 
     def update_pair(self, char1, char2, level):
         """ Updates the entry for char1, char2 to be the given support level.
@@ -156,4 +162,7 @@ def demo_update(tracker):
 if __name__ == "__main__":
     s = SupportTracker("support_data.json")
     demo_update(s)
-    pass
+
+    print (s.get_current_pairs())
+    s.add_new_random_pair()
+    print (s.get_current_pairs())
