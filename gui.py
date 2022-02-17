@@ -16,7 +16,7 @@ class SupportGUI:
         self.frame = ttk.Frame(self.root, padding=10)
         self.frame.grid()
 
-        ttk.Separator(self.frame, orient=tk.VERTICAL).grid(column=0, row=3, rowspan=2, sticky='ns')
+        ttk.Separator(self.frame, orient=tk.VERTICAL).grid(row=0, column=3, rowspan=2, sticky='ns')
 
         # start new run button
         self.start_new_run_button = ttk.Button(
@@ -25,7 +25,7 @@ class SupportGUI:
             command=self.tracker.start_new_run()
         )
         #self.start_new_run_button.pack(fill="x", side="top")
-        self.start_new_run_button.grid(row=0, column=4, sticky="EW", padx=10)
+        self.start_new_run_button.grid(row=0, column=4, sticky="EW")
 
         # reset all button
         self.reset_all_button = ttk.Button(
@@ -34,7 +34,7 @@ class SupportGUI:
             command=self.tracker.reset_all()
         )
         #self.reset_all_button.pack(fill="x", side="right")
-        self.reset_all_button.grid(row=1, column=4, sticky="EW", padx=10)
+        self.reset_all_button.grid(row=1, column=4, sticky="EW")
 
         # add random pair button
         self.add_random_pair_button = ttk.Button(
@@ -46,30 +46,30 @@ class SupportGUI:
         self.add_random_pair_button.grid(row=0, column=0, sticky="EW", columnspan=3)
 
         # drop down menu 1
-        self.label_options = [
+        self.char_options_1 = [
             "Eirika",
             "Seth",
             "L'Arachel"
         ]
-        self.clicked = tk.StringVar()
-        self.clicked.set("Character 1")
+        self.char1 = tk.StringVar()
+        self.char1.set("Character 1")
 
-        self.drop = tk.OptionMenu(self.frame, self.clicked, *self.label_options)
-        self.drop.grid(row=1, column=0,sticky="EW")
-        self.drop.config(width=10)
+        self.drop_char1 = tk.OptionMenu(self.frame, self.char1, *self.char_options_1)
+        self.drop_char1.grid(row=1, column=0,sticky="EW")
+        self.drop_char1.config(width=10)
 
         # drop down menu 2
-        self.label_options = [
+        self.char_options_2 = [
             "Eirika",
             "Seth",
             "L'Arachel"
         ]
-        self.clicked = tk.StringVar()
-        self.clicked.set("Character 2")
+        self.char2 = tk.StringVar()
+        self.char2.set("Character 2")
 
-        self.drop = tk.OptionMenu(self.frame, self.clicked, *self.label_options)
-        self.drop.grid(row=1, column=1,sticky="EW",padx=10)
-        self.drop.config(width=10)
+        self.drop_char2 = tk.OptionMenu(self.frame, self.char2, *self.char_options_2)
+        self.drop_char2.grid(row=1, column=1,sticky="EW",padx=10)
+        self.drop_char2.config(width=10)
 
         # add this pair button
         self.add_given_pair_button = ttk.Button(
@@ -80,10 +80,25 @@ class SupportGUI:
         # self.add_random_pair_button.pack(fill="x", side="top")
         self.add_given_pair_button.grid(row=1, column=2, sticky="EW")
 
+        ttk.Separator(self.frame, orient=tk.HORIZONTAL).grid(row=3, column=0, columnspan=5, sticky='ew', pady=10)
+
+        # display drop down menu
+        self.display_options = [
+            "Show pairs in current run",
+            "Show completed pairs",
+            "Show to-do pairs",
+            "Show all pairs"
+        ]
+        self.clicked = tk.StringVar()
+        self.clicked.set("Show pairs in current run")
+        self.drop = tk.OptionMenu(self.frame, self.clicked, *self.display_options)
+        self.drop.grid(row=4, column=0, sticky="EW", columnspan=5)
+        self.drop.config(width=10)
+
         # pairings grid
         self.pairings_grid = ScrollFrame(self.frame)
         #self.pairings_grid.pack(fill="x", side="top")
-        self.pairings_grid.grid(row=3, column=0, columnspan=5)
+        self.pairings_grid.grid(row=5, column=0, columnspan=5, pady=10)
 
     def start_mainloop(self):
         """ Runs mainloop of GUI program"""
@@ -92,7 +107,6 @@ class SupportGUI:
     def update_pairings_grid(self):
         for pairing in self.tracker.get_current_pairs():
             pass
-
 
 class ScrollFrame(tk.Frame):
 
@@ -110,7 +124,10 @@ class ScrollFrame(tk.Frame):
 
         self.frame.bind("<Configure>", self.onFrameConfigure)
 
-        self.populate()
+        self.populate_2()
+
+    def populate_2(self):
+        pass
 
     def populate(self):
         """Put in some fake data"""
@@ -123,7 +140,6 @@ class ScrollFrame(tk.Frame):
     def onFrameConfigure(self, event):
         """Reset the scroll region to encompass the inner frame"""
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
 
 if __name__ == "__main__":
     gui = SupportGUI()

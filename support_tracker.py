@@ -163,6 +163,3 @@ if __name__ == "__main__":
     s = SupportTracker("support_data.json")
     demo_update(s)
 
-    print (s.get_current_pairs())
-    s.add_new_random_pair()
-    print (s.get_current_pairs())
