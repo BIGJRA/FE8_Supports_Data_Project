@@ -1,0 +1,1 @@
+fe8_sort = ['Eirika', 'Seth', 'Franz', 'Gilliam', 'Vanessa', 'Moulder', 'Ross', 'Garcia', 'Neimi', 'Colm', 'Artur', 'Lute', 'Natasha', 'Joshua', 'Ephraim', 'Forde', 'Kyle', 'Tana', 'Amelia', 'Innes', 'Gerik', 'Tethys', 'Marisa', "L'Arachel", 'Dozla', "Saleh", "Ewan", 'Cormag', 'Rennac', "Duessel", "Knoll", 'Myrrh', 'Syrene']

@@ -151,6 +151,9 @@ class ScrollFrame(tk.Frame):
         """Helper function that resets the scroll region to encompass the inner frame"""
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-if __name__ == "__main__":
+def main():
     gui = SupportGUI()
     gui.start_mainloop()
+
+if __name__ == "__main__":
+    main()
