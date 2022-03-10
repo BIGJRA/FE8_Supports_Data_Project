@@ -53,15 +53,6 @@ def get_table_rows(url, strip_word=None):
 
     return {title: column for (title, column) in col}
 
-def get_custom_sort_order(dictionary):
-    """ Takes as input a column: values dictionary format that is obtained from serenes forest
-    and returns a list of characters sorted by their appearance in the page."""
-    d = dictionary['Character']
-    i = d.index("L’Arachel ")
-    d[i] = "L'Arachel"
-    for pos in range(len(d)):
-        d[pos] = d[pos].strip(" ")
-    return d
 
 def convert_to_character_dict(dictionary):
     """ Takes as input a column: values dictionary format that is obtained from serenes forest
@@ -102,20 +93,12 @@ def write_to_json(filename, dictionary):
 
 
 def main():
-    #global fe8_custom_sort.py
     serenes = "https://serenesforest.net/the-sacred-stones/characters/supports/"
     d = get_table_rows(serenes, strip_word="Character")
-    #fe8_custom_sort = get_custom_sort_order(d)
     d = convert_to_character_dict(d)
     write_to_json('support_data.json', d)
     print("Generated support_data.json")
-    #print (fe8_custom_sort)
 
-def dummy():
-    serenes = "https://serenesforest.net/the-sacred-stones/characters/supports/"
-    d = get_table_rows(serenes, strip_word="Character")
-    print (get_custom_sort_order(d))
 
 if __name__ == "__main__":
     main()
-    #dummy()
