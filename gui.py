@@ -1,7 +1,10 @@
 from support_tracker import SupportTracker
+from support_frame import SupportFrame
+
 # from tkinter import filedialog as fd
 from tkinter import ttk
 import tkinter as tk
+
 
 
 class SupportGUI:
@@ -108,6 +111,9 @@ class SupportGUI:
         for pairing in self.tracker.get_current_pairs():
             pass
 
+
+
+
 class ScrollFrame(tk.Frame):
 
     def __init__(self, parent):
@@ -123,19 +129,28 @@ class ScrollFrame(tk.Frame):
                                   tags="self.frame")
 
         self.frame.bind("<Configure>", self.onFrameConfigure)
+        self.items = [] # prevents garbage collection
+        self.populate()
 
-        self.populate_2()
 
-    def populate_2(self):
-        pass
 
     def populate(self):
-        """Put in some fake data"""
-        for row in range(100):
-            tk.Label(self.frame, text="%s" % row, width=3, borderwidth="1",
-                     relief="solid").grid(row=row, column=0)
-            t = "this is the second column for row fffffffffffffffffffff %s" % row
-            tk.Label(self.frame, text=t).grid(row=row, column=1)
+        chars = {
+        0: ("l'arachel", "dozla"),
+        1: ("cormag", "artur"),
+        2: ("ephraim", 'eirika'),
+        3: ("tethys", 'ewan'),
+        4: ('innes', 'tana'),
+        5: ('myrrh', 'franz'),
+        6: ('amelia', 'gilliam'),
+        7: ('rennac', 'gerik'),
+        8: ('colm', 'neimi'),
+        9: ('lute', 'syrene')
+        }
+        for row in range(10):
+            item = SupportFrame(self.frame, None, chars[row][0], chars[row][1])
+            item.grid_me(row=row, col=0, pady=5)
+            self.items.append(item)
 
     def onFrameConfigure(self, event):
         """Reset the scroll region to encompass the inner frame"""
