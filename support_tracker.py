@@ -1,6 +1,7 @@
 import json
 import random
 
+from fe8_custom_sort import fe8_sort
 
 class SupportTracker:
 
@@ -12,9 +13,18 @@ class SupportTracker:
 
     def save(self):
         """ Saves self. content to json_filename."""
-        # print (self.content)
         with open(self.filename, 'w') as f:
             f.write(json.dumps(self.content))
+
+    def get_rank(self, char1, char2):
+        for thing in self.content[char1]:
+            if thing['partner'] == char2:
+                return thing['finished']
+
+    def get_in_progress(self, char1, char2):
+        for thing in self.content[char1]:
+            if thing['partner'] == char2:
+                return thing['in_progress']
 
     def get_total_progress(self):
         """ Returns as an integer percent (rounded down) the number of completed support conversations.
@@ -25,8 +35,16 @@ class SupportTracker:
             for partner_data in self.content[character]:
                 total_supports += 3
                 curr_supports += self.support_conversations_dict[partner_data["finished"]]
-                # print (total_supports, curr_supports)
         return int(curr_supports / total_supports * 100)
+
+    def get_all_pairs(self):
+        result = set([])
+        for character in self.content:
+            for partner_data in self.content[character]:
+                l = [character, partner_data["partner"]]
+                l.sort(key=lambda x: fe8_sort.index(x))
+                result.add((l[0], l[1], partner_data["finished"]))
+        return list(result)
 
     def get_current_pairs(self):
         """ Returns as list of tuples the currently active pairs in the form
@@ -35,9 +53,11 @@ class SupportTracker:
         result = set([])
         for character in self.content:
             for partner_data in self.content[character]:
+                #print (character, partner_data)
                 if partner_data["in_progress"]:
-                    char1, char2 = sorted([character, partner_data["partner"]])
-                    result.add((char1, char2, partner_data["finished"]))
+                    l = [character, partner_data["partner"]]
+                    l.sort(key=lambda x: fe8_sort.index(x))
+                    result.add((l[0], l[1], partner_data["finished"]))
         return list(result)
 
     def get_finished_pairs(self):
@@ -48,8 +68,9 @@ class SupportTracker:
         for character in self.content:
             for partner_data in self.content[character]:
                 if partner_data["finished"] == "A":
-                    char1, char2 = sorted([character, partner_data["partner"]])
-                    result.add((char1, char2))
+                    l = [character, partner_data["partner"]]
+                    l.sort(key=lambda x: fe8_sort.index(x))
+                    result.add((l[0], l[1], partner_data["finished"]))
         return sorted(list(result))
 
     def get_unpaired_characters(self):
@@ -92,8 +113,10 @@ class SupportTracker:
     def add_new_random_pair(self):
         """ Adds a random new pair to the tracker with no support level.
         """
-        char1, char2 = self.get_new_pair()
-        self.set_current(char1, char2)
+        pair = self.get_new_pair()
+        if pair is None:
+            return
+        self.set_current(pair[0], pair[1])
 
     def update_pair(self, char1, char2, level):
         """ Updates the entry for char1, char2 to be the given support level.
@@ -111,6 +134,7 @@ class SupportTracker:
     def set_current(self, char1, char2, is_current=True):
         """ Sets char1, char2 to have in_progress value is_current.
         """
+
         i = 0
         while self.content[char1][i]["partner"] != char2:
             i += 1
@@ -119,6 +143,8 @@ class SupportTracker:
         while self.content[char2][i]["partner"] != char1:
             i += 1
         self.content[char2][i]["in_progress"] = is_current
+
+
         self.save()
 
     def start_new_run(self):
@@ -136,6 +162,12 @@ class SupportTracker:
                 partner_data["in_progress"] = False
         self.save()
 
+    def find_char_index(self, char_name):
+        """
+        :param char_name: string
+        :return: int
+        Returns the index in the tracker that the character name's data is located at for storage
+        """
 
 def demo_update(tracker):
     tracker.reset_all()
