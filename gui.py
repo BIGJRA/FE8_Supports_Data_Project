@@ -10,7 +10,10 @@ from fe8_custom_sort import fe8_sort
 class SupportGUI:
 
     def __init__(self):
-        self.tracker = SupportTracker("support_data.json")
+        try:
+            self.tracker = SupportTracker("support_data.json")
+        except FileNotFoundError:
+            self.tracker = SupportTracker(r"sacred_stones/support_data.json")
         #self.mode = "current" # current, remaining, completed, all
         self.mode_dict = {"Show pairs in current run": "current",
             "Show to-do pairs": "remaining",
@@ -151,6 +154,11 @@ class ScrollFrame(tk.Frame):
         """Helper function that resets the scroll region to encompass the inner frame"""
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-if __name__ == "__main__":
+
+def main():
     gui = SupportGUI()
     gui.start_mainloop()
+
+
+if __name__ == "__main__":
+    main()
