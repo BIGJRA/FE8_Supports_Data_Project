@@ -122,10 +122,10 @@ class SupportGUI:
         return self.tracker
 
 
-def main():
-    gui = SupportGUI("fe8")
+def main(game):
+    gui = SupportGUI(game)
     gui.start_mainloop()
 
 
 if __name__ == "__main__":
-    main()
+    main("fe7")
