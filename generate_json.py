@@ -105,17 +105,21 @@ def write_to_json(filename, dictionary):
         print(f"Generated {filename}.")
 
 
-def main():
+def main(filename):
     """
     Generates json file based on the serenes forest SacredStones link.
     :return: None
     """
-    serenes = "https://serenesforest.net/the-sacred-stones/characters/supports/"
-    raw_dict = get_table_rows(serenes, strip_word="Character")
+    if "blazing" in filename:
+        game = "fe7"
+    else:  # elif "sacred" in filename:
+        game = "fe8"
+    raw_dict = get_table_rows(filename, strip_word="Character")
 
     char_dict = convert_to_character_dict(raw_dict)
-    write_to_json('data/fe8_support_data.json', char_dict)
+    write_to_json(f'data/{game}_support_data.json', char_dict)
 
 
 if __name__ == "__main__":
-    main()
+    main('https://serenesforest.net/blazing-sword/characters/supports/')
+    main('https://serenesforest.net/the-sacred-stones/characters/supports/')

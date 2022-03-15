@@ -13,8 +13,10 @@ def custom_caps(char_name):
 class SupportFrame:
 
     def __init__(self, master, tracker, scroll_frame, char_1="L'Arachel", char_2='Duessel'):
+        self.extensions = {"fe7": ".png", "fe8": ".gif"}
         self.frame = tk.Frame(master, width=900, height=80)
         self.tracker = tracker
+        self.game = self.tracker.get_game()
         self.scroll_frame = scroll_frame
         self.images = []  # prevent garbage collecting
         self.buttons = {}  # prevent garbage collecting
@@ -22,8 +24,8 @@ class SupportFrame:
         # place items
         self.char_1 = char_1
         self.char_2 = char_2
-        self.place_name_label(char_1, 148)
-        self.place_name_label(char_2, 375)
+        self.place_name_label(char_1, 153)
+        self.place_name_label(char_2, 380)
         self.place_image(char_1, 48)
         self.place_image(char_2, 275)
         self.place_button(" ", 500)
@@ -48,7 +50,7 @@ class SupportFrame:
 
     def place_image(self, char_name, x_pos, y_pos=80):
         try:
-            filename = os.path.join('img', f'fe8{char_name}.gif')
+            filename = os.path.join('img', f'{self.game}{char_name}{self.extensions[self.game]}')
             img = Image.open(filename)
         except FileNotFoundError:  # handles l'arachel case
             filename = os.path.join('img', f'fe8larachel.gif')

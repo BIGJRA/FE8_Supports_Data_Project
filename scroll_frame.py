@@ -1,4 +1,4 @@
-from data.fe8_custom_sort import fe8_sort
+from data.sorts import *
 import tkinter as tk
 from support_frame import SupportFrame
 
@@ -26,6 +26,7 @@ class ScrollFrame(tk.Frame):
         # instantiates referential objects
         self.gui = gui
         self.tracker = gui.get_tracker()
+        self.game = self.tracker.get_game()
 
         # initially updates frame
         self.update()
@@ -58,11 +59,11 @@ class ScrollFrame(tk.Frame):
         # elif mode == "remaining":
         #    chars = self.tracker.get_remaining_pairs()
 
-        # sorts characters according to the sort index: first first, second second.
-        # chars.sort(key=lambda x: (fe8_sort.index(x[0]), fe8_sort.index(x[1])))
-
-        # alternative sort: sorts according to MAX of the sort index.
-        chars.sort(key=lambda x: max(fe8_sort.index(x[0]), fe8_sort.index(x[1])))
+        #  sort: sorts according to MAX of the sort index.
+        if self.game == 'fe8':
+            chars.sort(key=lambda x: (max(fe8_sort.index(x[0]), fe8_sort.index(x[1])), fe8_sort.index(x[0])))
+        else:  # self.game == 'fe7':
+            chars.sort(key=lambda x: (max(fe7_sort.index(x[0]), fe7_sort.index(x[1])), fe7_sort.index(x[0])))
 
         # add the correct rows
         for pos, data in enumerate(chars):

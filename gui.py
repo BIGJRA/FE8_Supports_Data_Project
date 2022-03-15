@@ -6,14 +6,14 @@ import tkinter as tk
 
 class SupportGUI:
 
-    def __init__(self, tracker=None):
+    def __init__(self, game):
         # stores the given tracker as a class object
-        # self.tracker = tracker
-        self.tracker = SupportTracker("data/fe8_support_data.json")  # TODO: fix this via os module
+        self.tracker = SupportTracker(f"data/{game}_support_data.json")  # TODO: fix this via os module
+        self.game = game
 
         # Tkinter root object
         self.root = tk.Tk()
-        self.root.title('FE8 Support Tracker')
+        self.root.title(f'{self.game.upper()} Support Tracker')
 
         # Tkinter frame, master root. Holds all other objects of the GUI
         self.frame = ttk.Frame(self.root, padding=10)
@@ -123,7 +123,7 @@ class SupportGUI:
 
 
 def main():
-    gui = SupportGUI()
+    gui = SupportGUI("fe8")
     gui.start_mainloop()
 
 

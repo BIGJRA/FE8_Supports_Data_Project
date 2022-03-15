@@ -1,16 +1,25 @@
 import json
 import random
 
-from data.fe8_custom_sort import fe8_sort
+from data.sorts import *
 
 
 class SupportTracker:
 
     def __init__(self, json_filename):
         self.filename = json_filename
+        if "fe7" in self.filename:
+            self.game = "fe7"
+        elif "fe8" in self.filename:
+            self.game = "fe8"
+        else: # placeholder for errors
+            self.game = "fe8"
         with open(self.filename) as f:
             self.content = json.load(f)
         self.support_conversations_dict = {"A": 3, "B": 2, "C": 1, "N/A": 0}
+
+    def get_game(self):
+        return self.game
 
     def save(self):
         """ Saves self. content to json_filename."""
@@ -43,7 +52,10 @@ class SupportTracker:
         for character in self.content:
             for partner_data in self.content[character]:
                 pair = [character, partner_data["partner"]]
-                pair.sort(key=lambda x: fe8_sort.index(x))
+                if self.game == 'fe8':
+                    pair.sort(key=lambda x: fe8_sort.index(x))
+                else:  # self.game == 'fe7':
+                    pair.sort(key=lambda x: fe7_sort.index(x))
                 result.add((pair[0], pair[1], partner_data["finished"]))
         return list(result)
 
@@ -57,11 +69,14 @@ class SupportTracker:
                 # print (character, partner_data)
                 if partner_data["in_progress"]:
                     pair = [character, partner_data["partner"]]
-                    pair.sort(key=lambda x: fe8_sort.index(x))
+                    if self.game == 'fe8':
+                        pair.sort(key=lambda x: fe8_sort.index(x))
+                    else:  # self.game == 'fe7':
+                        pair.sort(key=lambda x: fe7_sort.index(x))
                     result.add((pair[0], pair[1], partner_data["finished"]))
         return list(result)
 
-    def get_finished_pairs(self):
+    '''def get_finished_pairs(self):
         """ Returns as list of tuples the currently active pairs in the form
         char1, char2
         """
@@ -72,7 +87,7 @@ class SupportTracker:
                     pair = [character, partner_data["partner"]]
                     pair.sort(key=lambda x: fe8_sort.index(x))
                     result.add((pair[0], pair[1], partner_data["finished"]))
-        return sorted(list(result))
+        return sorted(list(result))'''
 
     def get_unpaired_characters(self):
         """ Returns list of characters which are not currently paired. """
