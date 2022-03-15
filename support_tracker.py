@@ -1,7 +1,8 @@
 import json
 import random
 
-from fe8_custom_sort import fe8_sort
+from data.fe8_custom_sort import fe8_sort
+
 
 class SupportTracker:
 
@@ -41,9 +42,9 @@ class SupportTracker:
         result = set([])
         for character in self.content:
             for partner_data in self.content[character]:
-                l = [character, partner_data["partner"]]
-                l.sort(key=lambda x: fe8_sort.index(x))
-                result.add((l[0], l[1], partner_data["finished"]))
+                pair = [character, partner_data["partner"]]
+                pair.sort(key=lambda x: fe8_sort.index(x))
+                result.add((pair[0], pair[1], partner_data["finished"]))
         return list(result)
 
     def get_current_pairs(self):
@@ -53,11 +54,11 @@ class SupportTracker:
         result = set([])
         for character in self.content:
             for partner_data in self.content[character]:
-                #print (character, partner_data)
+                # print (character, partner_data)
                 if partner_data["in_progress"]:
-                    l = [character, partner_data["partner"]]
-                    l.sort(key=lambda x: fe8_sort.index(x))
-                    result.add((l[0], l[1], partner_data["finished"]))
+                    pair = [character, partner_data["partner"]]
+                    pair.sort(key=lambda x: fe8_sort.index(x))
+                    result.add((pair[0], pair[1], partner_data["finished"]))
         return list(result)
 
     def get_finished_pairs(self):
@@ -68,9 +69,9 @@ class SupportTracker:
         for character in self.content:
             for partner_data in self.content[character]:
                 if partner_data["finished"] == "A":
-                    l = [character, partner_data["partner"]]
-                    l.sort(key=lambda x: fe8_sort.index(x))
-                    result.add((l[0], l[1], partner_data["finished"]))
+                    pair = [character, partner_data["partner"]]
+                    pair.sort(key=lambda x: fe8_sort.index(x))
+                    result.add((pair[0], pair[1], partner_data["finished"]))
         return sorted(list(result))
 
     def get_unpaired_characters(self):
@@ -144,7 +145,6 @@ class SupportTracker:
             i += 1
         self.content[char2][i]["in_progress"] = is_current
 
-
         self.save()
 
     def start_new_run(self):
@@ -169,6 +169,7 @@ class SupportTracker:
         Returns the index in the tracker that the character name's data is located at for storage
         """
 
+
 def demo_update(tracker):
     tracker.reset_all()
     tracker.update_pair("Eirika", "Ephraim", "A")
@@ -192,6 +193,5 @@ def demo_update(tracker):
 
 
 if __name__ == "__main__":
-    s = SupportTracker("support_data.json")
+    s = SupportTracker("data/fe8_support_data.json")
     demo_update(s)
-

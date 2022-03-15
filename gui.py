@@ -1,30 +1,27 @@
 from support_tracker import SupportTracker
-from support_frame import SupportFrame
-
-# from tkinter import filedialog as fd
+from scroll_frame import ScrollFrame
 from tkinter import ttk
 import tkinter as tk
 
-from fe8_custom_sort import fe8_sort
 
 class SupportGUI:
 
-    def __init__(self):
-        self.tracker = SupportTracker("support_data.json")
-        #self.mode = "current" # current, remaining, completed, all
-        self.mode_dict = {"Show pairs in current run": "current",
-            "Show to-do pairs": "remaining",
-            "Show all pairs": "all"
-                          }
+    def __init__(self, tracker=None):
+        # stores the given tracker as a class object
+        # self.tracker = tracker
+        self.tracker = SupportTracker("data/fe8_support_data.json")  # TODO: fix this via os module
 
+        # Tkinter root object
         self.root = tk.Tk()
         self.root.title('FE8 Support Tracker')
-        #self.root.geometry("500x500")
 
+        # Tkinter frame, master root. Holds all other objects of the GUI
         self.frame = ttk.Frame(self.root, padding=10)
         self.frame.grid()
 
+        # Separators for left side and right side buttons, top and bottom sections
         ttk.Separator(self.frame, orient=tk.VERTICAL).grid(row=0, column=3, rowspan=2, sticky='ns')
+        ttk.Separator(self.frame, orient=tk.HORIZONTAL).grid(row=2, column=0, columnspan=5, sticky='ew', pady=10)
 
         # start new run button
         self.start_new_run_button = ttk.Button(
@@ -32,7 +29,6 @@ class SupportGUI:
             text='Start new run',
             command=self.start_new_run_helper
         )
-        #self.start_new_run_button.pack(fill="x", side="top")
         self.start_new_run_button.grid(row=0, column=4, sticky="EW")
 
         # reset all button
@@ -41,7 +37,6 @@ class SupportGUI:
             text='Reset all progress',
             command=self.reset_all_helper
         )
-        #self.reset_all_button.pack(fill="x", side="right")
         self.reset_all_button.grid(row=1, column=4, sticky="EW")
 
         # add random pair button
@@ -50,30 +45,30 @@ class SupportGUI:
             text='Add random pair to current run',
             command=self.add_new_random_pair_helper
         )
-        #self.add_random_pair_button.pack(fill="x", side="top")
         self.add_random_pair_button.grid(row=0, column=0, sticky="EW", columnspan=3)
-
-        ttk.Separator(self.frame, orient=tk.HORIZONTAL).grid(row=2, column=0, columnspan=5, sticky='ew', pady=10)
 
         # display drop down menu
         self.display_options = [
             "Show pairs in current run",
-            #"Show to-do pairs",
-            "Show all pairs"
+            # "Show to-do pairs",
+            "Show all pairs"  # TODO: add more modes here
         ]
+        self.mode_dict = {"Show pairs in current run": "current",
+                          # "Show to-do pairs": "remaining",
+                          "Show all pairs": "all"
+                          }
+
         self.clicked = tk.StringVar()
-        self.clicked.set("Show pairs in current run")
+        self.clicked.set(self.display_options[0])  # sets default drop menu text
         self.drop = tk.OptionMenu(self.frame, self.clicked, *self.display_options)
         self.drop.grid(row=1, column=0, sticky="EW", columnspan=2)
-        self.drop.config(width=10)
 
         # accept button
         self.submit_button = tk.Button(self.frame, text="Update", command=self.set_mode_helper)
-        self.submit_button.grid(row=1, column=2, sticky = "EW", columnspan=1)
+        self.submit_button.grid(row=1, column=2, sticky="EW", columnspan=1)
 
-        # pairings grid
-        self.scroll_frame = ScrollFrame(self.frame, self.tracker, self)
-        #self.pairings_grid.pack(fill="x", side="top")
+        # pairings grid - uses my ScrollFrame class
+        self.scroll_frame = ScrollFrame(self.frame, self)
         self.scroll_frame.grid(row=3, column=0, columnspan=5, pady=10)
 
     def start_mainloop(self):
@@ -81,79 +76,56 @@ class SupportGUI:
         self.root.mainloop()
 
     def start_new_run_helper(self):
+        """
+        :return: None
+        Command done when "Start new run" button is pressed. """
         self.tracker.start_new_run()
         self.scroll_frame.update()
 
     def reset_all_helper(self):
+        """
+        :return: None
+        Command done when "Reset all" button is pressed.
+        TODO: maybe do a check that the user is serious?
+        """
         self.tracker.reset_all()
         self.scroll_frame.update()
 
     def add_new_random_pair_helper(self):
+        """
+        :return: None
+        Command done when "Add new random pair" button is pressed.
+        """
         self.tracker.add_new_random_pair()
         self.scroll_frame.update()
 
     def set_mode_helper(self):
-        self.scroll_frame.set_mode(self.mode_dict[self.clicked.get()])
+        """
+        Command done when "Update" button is pressed. Updates the internal mode and the SupportFrame.
+        :return: None
+        """
+        # self.scroll_frame.set_mode(self.get_mode())
         self.scroll_frame.update()
 
-class ScrollFrame(tk.Frame):
-
-    def __init__(self, parent, tracker=None, gui=None):
-        tk.Frame.__init__(self, parent)
-        self.canvas = tk.Canvas(self, borderwidth=0, height=500, width=800)
-        self.frame = tk.Frame(self.canvas)
-        self.vsb = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.vsb.set)
-
-        self.vsb.pack(side="right", fill="y")
-        self.canvas.pack(side="left", fill="both", expand=True)
-        self.canvas.create_window((4, 4), window=self.frame, anchor="nw",
-                                  tags="self.frame")
-
-        self.frame.bind("<Configure>", self.onFrameConfigure)
-        self.items = [] # prevents garbage collection
-        self.tracker = tracker
-        self.mode = 'current'
-
-        self.gui = gui
-        self.update()
-
-    def set_mode(self, mode):
-        self.mode = mode
-
-    def update(self):
+    def get_mode(self):
         """
-        :return: None
-        Updates the Scroll Frame with the information in the tracker with the given mode.
+        Returns the short string version of the mode
+        :return: str
         """
+        return self.mode_dict[self.clicked.get()]
 
-        # resets the entire table before doing the update
-        for item in self.items:
-            item.destroy()
+    def get_tracker(self):
+        """
+        Returns the tracker object of this gui
+        :return: SupportTracker
+        """
+        return self.tracker
 
-        #gets the correct set of characters
-        mode = self.mode
-        if self.mode == "current":
-            chars = self.tracker.get_current_pairs()
-        if self.mode == "all":
-            chars = self.tracker.get_all_pairs()
-        if self.mode == "remaining":
-            chars = self.tracker.get_remaining_pairs()
-        chars.sort(key = lambda x: (fe8_sort.index(x[0]), fe8_sort.index(x[1])))
-
-        # add the correct rows
-        for row in range(len(chars)):
-            item = SupportFrame(self.frame, self.tracker, self, chars[row][0], chars[row][1])
-            item.grid_me(row=row, col=0, pady=5)
-            self.items.append(item)
-
-    def onFrameConfigure(self, event):
-        """Helper function that resets the scroll region to encompass the inner frame"""
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
 def main():
     gui = SupportGUI()
     gui.start_mainloop()
+
 
 if __name__ == "__main__":
     main()

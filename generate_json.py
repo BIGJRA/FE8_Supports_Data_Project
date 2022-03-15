@@ -1,11 +1,14 @@
 import requests
 import lxml.html as lh
 import json
-#import random
 
 
-def get_table_rows(url, strip_word=None):
-    """ Takes as input a string containing url.
+def get_table_rows(url, strip_word=""):
+    """
+    :param url: str
+    :param strip_word: str
+    :return: dict
+    Takes as input a string containing url.
     Returns a dictionary in the form of a tuple:
     Index 0 contains the table column name,
     Index 1 is a list of the text in the entries going down."""
@@ -53,18 +56,12 @@ def get_table_rows(url, strip_word=None):
 
     return {title: column for (title, column) in col}
 
-def get_custom_sort_order(dictionary):
-    """ Takes as input a column: values dictionary format that is obtained from serenes forest
-    and returns a list of characters sorted by their appearance in the page."""
-    d = dictionary['Character']
-    i = d.index("L’Arachel ")
-    d[i] = "L'Arachel"
-    for pos in range(len(d)):
-        d[pos] = d[pos].strip(" ")
-    return d
 
 def convert_to_character_dict(dictionary):
-    """ Takes as input a column: values dictionary format that is obtained from serenes forest
+    """
+    :param dictionary: dict
+    :return: dict
+    Takes as input a column: values dictionary format that is obtained from serenes forest
     and returns a dictionary with key: character and values: list of support partners,
     represented as tuples (name, base, rate)."""
 
@@ -97,25 +94,28 @@ def convert_to_character_dict(dictionary):
 
 
 def write_to_json(filename, dictionary):
+    """
+    :param filename: str
+    :param dictionary: dict
+    :return: None
+    Writes the dictionary to given filename.
+    """
     with open(filename, 'w') as f:
         f.write(json.dumps(dictionary))
+        print(f"Generated {filename}.")
 
 
 def main():
-    #global fe8_custom_sort.py
+    """
+    Generates json file based on the serenes forest SacredStones link.
+    :return: None
+    """
     serenes = "https://serenesforest.net/the-sacred-stones/characters/supports/"
-    d = get_table_rows(serenes, strip_word="Character")
-    #fe8_custom_sort = get_custom_sort_order(d)
-    d = convert_to_character_dict(d)
-    write_to_json('support_data.json', d)
-    print("Generated support_data.json")
-    #print (fe8_custom_sort)
+    raw_dict = get_table_rows(serenes, strip_word="Character")
 
-def dummy():
-    serenes = "https://serenesforest.net/the-sacred-stones/characters/supports/"
-    d = get_table_rows(serenes, strip_word="Character")
-    print (get_custom_sort_order(d))
+    char_dict = convert_to_character_dict(raw_dict)
+    write_to_json('data/fe8_support_data.json', char_dict)
+
 
 if __name__ == "__main__":
     main()
-    #dummy()

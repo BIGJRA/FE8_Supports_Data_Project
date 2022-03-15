@@ -6,39 +6,48 @@ import requests
 from bs4 import BeautifulSoup
 import os
 
-try:
-    os.mkdir("img")
-except FileExistsError:
-    pass
 
-site = 'https://serenesforest.net/the-sacred-stones/characters/introduction/'
+def scrape_images(site):
+    """
+    Scrapes images from site and puts them in img folder.
+    :param site: str
+    :return: None
+    """
+    try:
+        os.mkdir("img")
+    except FileExistsError:
+        pass
 
-response = requests.get(site)
+    response = requests.get(site)
 
-soup = BeautifulSoup(response.text, 'html.parser')
-img_tags = soup.find_all('img')
+    soup = BeautifulSoup(response.text, 'html.parser')
+    img_tags = soup.find_all('img')
 
-urls = ["https://serenesforest.net" + img['src'] for img in img_tags]
+    urls = ["https://serenesforest.net" + img['src'] for img in img_tags]
 
-print(f"{len(urls)} urls found. Processing...")
-# print (urls)
+    print(f"{len(urls)} urls found. Processing...")
+    # print (urls)
 
-skip = 0
-for url in urls:
-    filename = re.search(r'/([\w_-]+[.](jpg|gif|png))$', url)
-    if not filename:
-        print("Regex didn't match with the url: {}".format(url))
-        skip += 1
-        continue
-    path = os.path.join("img", filename.group(1))
-    with open(path, 'wb') as f:
-        '''if 'http' not in url:
-            # sometimes an image source can be relative
-            # if it is provide the base url which also happens
-            # to be the site variable atm.
-            url = '{}{}'.format(site, url)'''
-        response = requests.get(url)
-        f.write(response.content)
-        print(f"Processed {(filename.group(0))}.")
+    skip = 0
+    for url in urls:
+        filename = re.search(r'/([\w_-]+[.](jpg|gif|png))$', url)
+        if not filename:
+            print("Regex didn't match with the url: {}".format(url))
+            skip += 1
+            continue
+        path = os.path.join("img", filename.group(1))
+        with open(path, 'wb') as f:
+            '''if 'http' not in url:
+                # sometimes an image source can be relative
+                # if it is provide the base url which also happens
+                # to be the site variable atm.
+                url = '{}{}'.format(site, url)'''
+            response = requests.get(url)
+            f.write(response.content)
+            print(f"Processed {(filename.group(0))}.")
 
-print(f"Of {len(urls)} urls found, {len(urls) - skip} processed and {skip} skipped.")
+    print(f"Of {len(urls)} urls found, {len(urls) - skip} processed and {skip} skipped.")
+
+
+if __name__ == "__main__":
+    scrape_images('https://serenesforest.net/the-sacred-stones/characters/introduction/')
