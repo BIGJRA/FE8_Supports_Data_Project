@@ -1,6 +1,9 @@
+""" Module which generates a save data JSON from the web for each fire emblem game.
+"""
+
+import json
 import requests
 import lxml.html as lh
-import json
 
 
 def get_table_rows(url, strip_word=""):
@@ -26,9 +29,9 @@ def get_table_rows(url, strip_word=""):
     col = []
     i = 0
     # For each row, store each first element (header) and an empty list
-    for t in tr_elements[0]:
+    for text in tr_elements[0]:
         i += 1
-        name = t.text_content()
+        name = text.text_content()
         # print ('%d:"%s"' % (i, name))
         col.append((name, []))
 
@@ -41,8 +44,8 @@ def get_table_rows(url, strip_word=""):
         i = 0
 
         # Iterate through each element of the row
-        for t in row_j.iterchildren():
-            data = t.text_content()
+        for text in row_j.iterchildren():
+            data = text.text_content()
 
             # Here it skips the row if the first element is strip_word. Helps solve a problem
             # in the serenes forest link which has internal table headers.
@@ -54,7 +57,7 @@ def get_table_rows(url, strip_word=""):
             # Increment i for the next column
             i += 1
 
-    return {title: column for (title, column) in col}
+    return dict(col)
 
 
 def convert_to_character_dict(dictionary):
@@ -100,8 +103,8 @@ def write_to_json(filename, dictionary):
     :return: None
     Writes the dictionary to given filename.
     """
-    with open(filename, 'w') as f:
-        f.write(json.dumps(dictionary))
+    with open(filename, 'w', encoding='utf-8') as file:
+        file.write(json.dumps(dictionary))
         print(f"Generated {filename}.")
 
 

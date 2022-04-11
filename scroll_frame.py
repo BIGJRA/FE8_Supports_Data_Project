@@ -1,10 +1,14 @@
-from data.sorts import *
+""" Scroll Frame class for GUI
+"""
+
 import tkinter as tk
+from data.sorts import fe7_sort, fe8_sort
 from support_frame import SupportFrame
 
 
 class ScrollFrame(tk.Frame):
-
+    """ Class which handles the scroll frame part of the GUI
+    """
     def __init__(self, parent, gui=None):
 
         # Do not change this block - from the internet. Creates the scroll block
@@ -61,12 +65,16 @@ class ScrollFrame(tk.Frame):
 
         #  sort: sorts according to MAX of the sort index.
         if self.game == 'fe8':
-            chars.sort(key=lambda x: (max(fe8_sort.index(x[0]), fe8_sort.index(x[1])), fe8_sort.index(x[0])))
+            chars.sort(
+                key=lambda x: (max(fe8_sort.index(x[0]), fe8_sort.index(x[1])),
+                               fe8_sort.index(x[0])))
         else:  # self.game == 'fe7':
-            chars.sort(key=lambda x: (max(fe7_sort.index(x[0]), fe7_sort.index(x[1])), fe7_sort.index(x[0])))
+            chars.sort(
+                key=lambda x: (max(fe7_sort.index(x[0]), fe7_sort.index(x[1])),
+                               fe7_sort.index(x[0])))
 
         # add the correct rows
         for pos, data in enumerate(chars):
-            item = SupportFrame(self.frame, self.tracker, self, data[0], data[1])
+            item = SupportFrame(self.frame, self.tracker, self, [data[0], data[1]])
             item.grid_me(row=pos, col=0, pady=5)
             self.items.append(item)

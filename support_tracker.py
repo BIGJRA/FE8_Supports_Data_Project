@@ -1,43 +1,64 @@
+""" SupportTracker class for JSON and GUI interactivity
+"""
 import json
 import random
 
-from data.sorts import *
+from data.sorts import fe8_sort, fe7_sort
 
 
 class SupportTracker:
-
+    """ SupportTracker class for data load and GUI representation
+    """
     def __init__(self, json_filename):
         self.filename = json_filename
         if "fe7" in self.filename:
             self.game = "fe7"
         elif "fe8" in self.filename:
             self.game = "fe8"
-        else: # placeholder for errors
+        else:  # placeholder for errors
             self.game = "fe8"
-        with open(self.filename) as f:
-            self.content = json.load(f)
+        with open(self.filename, encoding='utf-8') as file:
+            self.content = json.load(file)
         self.support_conversations_dict = {"A": 3, "B": 2, "C": 1, "N/A": 0}
 
     def get_game(self):
+        """
+        :return: str
+        Returns the name of the game (fe7, fe8)
+        """
         return self.game
 
     def save(self):
         """ Saves self. content to json_filename."""
-        with open(self.filename, 'w') as f:
-            f.write(json.dumps(self.content))
+        with open(self.filename, 'w', encoding='utf-8') as file:
+            file.write(json.dumps(self.content))
 
     def get_rank(self, char1, char2):
+        """
+        :param char1: str
+        :param char2: str
+        :return: str
+        Returns the rank as a string of the support between the pair
+        """
         for thing in self.content[char1]:
             if thing['partner'] == char2:
                 return thing['finished']
+        return "No pairing found."
 
     def get_in_progress(self, char1, char2):
+        """
+        :param char1: str
+        :param char2: str
+        :return: str
+        Returns the progress/status as a string of the support between the pair
+        """
         for thing in self.content[char1]:
             if thing['partner'] == char2:
                 return thing['in_progress']
+        return "No pairing found."
 
     def get_total_progress(self):
-        """ Returns as an integer percent (rounded down) the number of completed support conversations.
+        """ Returns as an integer percent the number of completed support conversations.
         """
         total_supports = 0
         curr_supports = 0
@@ -48,14 +69,18 @@ class SupportTracker:
         return int(curr_supports / total_supports * 100)
 
     def get_all_pairs(self):
+        """
+        :return: list[str]
+        Returns list of strings which represent all support pairs
+        """
         result = set([])
         for character in self.content:
             for partner_data in self.content[character]:
                 pair = [character, partner_data["partner"]]
                 if self.game == 'fe8':
-                    pair.sort(key=lambda x: fe8_sort.index(x))
+                    pair.sort(key=fe8_sort.index)
                 else:  # self.game == 'fe7':
-                    pair.sort(key=lambda x: fe7_sort.index(x))
+                    pair.sort(key=fe7_sort.index)
                 result.add((pair[0], pair[1], partner_data["finished"]))
         return list(result)
 
@@ -70,24 +95,24 @@ class SupportTracker:
                 if partner_data["in_progress"]:
                     pair = [character, partner_data["partner"]]
                     if self.game == 'fe8':
-                        pair.sort(key=lambda x: fe8_sort.index(x))
+                        pair.sort(key=fe8_sort.index)
                     else:  # self.game == 'fe7':
-                        pair.sort(key=lambda x: fe7_sort.index(x))
+                        pair.sort(key=fe7_sort.index)
                     result.add((pair[0], pair[1], partner_data["finished"]))
         return list(result)
 
-    '''def get_finished_pairs(self):
-        """ Returns as list of tuples the currently active pairs in the form
-        char1, char2
-        """
-        result = set([])
-        for character in self.content:
-            for partner_data in self.content[character]:
-                if partner_data["finished"] == "A":
-                    pair = [character, partner_data["partner"]]
-                    pair.sort(key=lambda x: fe8_sort.index(x))
-                    result.add((pair[0], pair[1], partner_data["finished"]))
-        return sorted(list(result))'''
+    # '''def get_finished_pairs(self):
+    #     """ Returns as list of tuples the currently active pairs in the form
+    #     char1, char2
+    #     """
+    #     result = set([])
+    #     for character in self.content:
+    #         for partner_data in self.content[character]:
+    #             if partner_data["finished"] == "A":
+    #                 pair = [character, partner_data["partner"]]
+    #                 pair.sort(key=lambda x: fe8_sort.index(x))
+    #                 result.add((pair[0], pair[1], partner_data["finished"]))
+    #     return sorted(list(result))'''
 
     def get_unpaired_characters(self):
         """ Returns list of characters which are not currently paired. """
@@ -95,7 +120,7 @@ class SupportTracker:
         for char in self.content:
             skip = False
             for pair in self.get_current_pairs():
-                if char == pair[0] or char == pair[1]:
+                if char in (pair[0], pair[1]):
                     skip = True
                     break
             if not skip:
@@ -107,22 +132,22 @@ class SupportTracker:
         Only picks from the characters which have not yet reached A support.
         """
         chars = self.get_unpaired_characters()
-        n = len(chars)
-        check_idx = random.randint(0, n - 1)
+        num_chars = len(chars)
+        check_idx = random.randint(0, num_chars - 1)
         check_count = 0
-        while check_count < n:
+        while check_count < num_chars:
             curr = chars[check_idx]
-            m = len(self.content[curr])
-            partner_idx = random.randint(0, m - 1)
+            num_partners = len(self.content[curr])
+            partner_idx = random.randint(0, num_partners - 1)
             partner_count = 0
-            while partner_count < m:
+            while partner_count < num_partners:
                 partner_data = self.content[curr][partner_idx]
                 if partner_data["partner"] not in chars or partner_data["finished"] == "A":
-                    partner_idx = (partner_idx + 1) % m
+                    partner_idx = (partner_idx + 1) % num_partners
                     partner_count += 1
                 else:
                     return curr, partner_data["partner"]
-            check_idx = (check_idx + 1) % n
+            check_idx = (check_idx + 1) % num_chars
             check_count += 1
         return None
 
@@ -185,28 +210,5 @@ class SupportTracker:
         """
 
 
-def demo_update(tracker):
-    tracker.reset_all()
-    tracker.update_pair("Eirika", "Ephraim", "A")
-    tracker.update_pair("Gilliam", "Franz", "A")
-    tracker.update_pair("Kyle", "Colm", "A")
-    tracker.update_pair("Joshua", "Natasha", "A")
-    tracker.update_pair("Tethys", "Gerik", "A")
-    tracker.update_pair("Artur", "Cormag", "A")
-    tracker.update_pair("Innes", "Tana", "A")
-    tracker.update_pair("Knoll", "Duessel", "A")
-    tracker.update_pair("Dozla", "L'Arachel", "A")
-    tracker.set_current("Eirika", "Ephraim")
-    tracker.set_current("Gilliam", "Franz")
-    tracker.set_current("Kyle", "Colm")
-    tracker.set_current("Joshua", "Natasha")
-    tracker.set_current("Tethys", "Gerik")
-    tracker.set_current("Artur", "Cormag")
-    tracker.set_current("Innes", "Tana")
-    tracker.set_current("Knoll", "Duessel")
-    tracker.set_current("Dozla", "L'Arachel")
-
-
 if __name__ == "__main__":
     s = SupportTracker("data/fe8_support_data.json")
-    demo_update(s)

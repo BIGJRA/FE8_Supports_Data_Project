@@ -1,10 +1,13 @@
+""" Scrapes images from SerenesForest. """
+
 # CREDIT: Base code written by Jonathan on
 # https://stackoverflow.com/questions/18408307/how-to-extract-and-download-all-images-from-a-website-using-beautifulsoup
 
+
 import re
+import os
 import requests
 from bs4 import BeautifulSoup
-import os
 
 
 def scrape_images(site):
@@ -30,7 +33,7 @@ def scrape_images(site):
 
     if game == "fe8":
         urls = ["https://serenesforest.net" + img['src'] for img in img_tags]
-    else:  #game == "fe7":
+    else:  # game == "fe7":
         urls = [img['src'] for img in img_tags]
 
     print(f"{len(urls)} urls found. Processing...")
@@ -40,7 +43,7 @@ def scrape_images(site):
     for url in urls:
         filename = re.search(r'/([\w_-]+[.](jpg|gif|png))$', url)
         if not filename:
-            print("Regex didn't match with the url: {}".format(url))
+            print(f"Regex didn't match with the url: {url}")
             continue
 
         if game == "fe7":
@@ -52,20 +55,14 @@ def scrape_images(site):
         else:  # game == "fe8":
             basename = filename.group(1)
             path = os.path.join("img", basename)
-
-        if basename in ["fe7eleanora.png", "fe8caellach.gif"]:  # end points - nonplayable characters
+        if basename in ["fe7eleanora.png", "fe8caellach.gif"]:  # non playable characters
             break
-        if basename in ["fe8orson.gif"]: # skipped characters - fe8 orson, e.g.
+        if basename in ["fe8orson.gif"]:  # skipped characters - fe8 orson, e.g.
             continue
 
-        with open(path, 'wb') as f:
-            '''if 'http' not in url:
-                # sometimes an image source can be relative
-                # if it is provide the base url which also happens
-                # to be the site variable atm.
-                url = '{}{}'.format(site, url)'''
+        with open(path, 'wb') as file:
             response = requests.get(url)
-            f.write(response.content)
+            file.write(response.content)
             print(f"Processed {basename}.")
             processed += 1
 
